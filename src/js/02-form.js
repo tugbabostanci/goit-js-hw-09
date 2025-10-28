@@ -1,35 +1,40 @@
-document.addEventListener('DOMContentLoaded', () => {
-  const form = document.querySelector('.feedback-form');
-  const storageKey = 'feedback-form-state';
+const formData = {
+  email: '',
+  message: '',
+};
 
-  const savedData = localStorage.getItem(storageKey);
-  if (savedData) {
-    const formData = JSON.parse(savedData);
-    form.email.value = formData.email || '';
-    form.message.value = formData.message || '';
+const form = document.querySelector('.feedback-form');
+const emailInput = form.querySelector('input[name="email"]');
+const messageTextarea = form.querySelector('textarea[name="message"]');
+
+const savedData = JSON.parse(localStorage.getItem('feedback-form-state'));
+
+if (savedData) {
+  formData.email = savedData.email;
+  formData.message = savedData.message;
+  emailInput.value = formData.email;
+  messageTextarea.value = formData.message;
+}
+
+form.addEventListener('input', event => {
+  const { name, value } = event.target;
+  if (name === 'email') {
+    formData.email = value;
+  } else if (name === 'message') {
+    formData.message = value;
   }
 
-  form.addEventListener('input', () => {
-    const data = {
-      email: form.email.value.trim(),
-      message: form.message.value.trim(),
-    };
-    localStorage.setItem(storageKey, JSON.stringify(data));
-  });
+  localStorage.setItem('feedback-form-state', JSON.stringify(formData));
+});
 
-  form.addEventListener('submit', event => {
-    event.preventDefault();
+form.addEventListener('submit', event => {
+  event.preventDefault();
 
-    const email = form.email.value.trim();
-    const message = form.message.value.trim();
-
-    if (!email || !message) {
-      alert('Lütfen tüm alanları doldurun.');
-      return;
-    }
-
-    console.log({ email, message });
-    localStorage.removeItem(storageKey);
+  if (formData.email === '' || formData.message === '') {
+    alert('Fill please all fields');
+  } else {
+    console.log(formData);
+    localStorage.removeItem('feedback-form-state');
     form.reset();
-  });
+  }
 });
